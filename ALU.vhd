@@ -22,14 +22,14 @@ end ALU;
 
 architecture Behavioral of ALU is
 signal ALU_value : std_logic_vector(7 downto 0);
-signal B_knot : std_logic_vector(7 downto 0);
+--signal B_knot : std_logic_vector(7 downto 0);
 signal carry : std_logic;
 signal negetive : std_logic;
 begin
 
 process(A, B, SorD) is
 variable a_dash : unsigned(8 downto 0) := unsigned('0' & A);
-variable b_dash : unsigned(8 downto 0) := unsigned('0' & B_knot);
+variable b_dash : unsigned(8 downto 0) := unsigned('0' & B);
 variable temp : unsigned(8 downto 0);
 begin
 temp := a_dash + b_dash;
