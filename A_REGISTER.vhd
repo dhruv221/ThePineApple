@@ -9,24 +9,26 @@ entity A_REGISTER is
            AO : in STD_LOGIC;
            --end of control signals
            A_inout_bus : inout STD_LOGIC_VECTOR (7 downto 0);
+           A_value : out std_logic_vector (7 downto 0);
            CLK: in STD_LOGIC;
            RST : in STD_LOGIC);
 end A_REGISTER;
 
 
 architecture Behavioral of A_REGISTER is
-signal A_reg_value: std_logic_vector(7 downto 0);
+signal A_reg_value: std_logic_vector(7 downto 0):= (others => '0');
 begin
 
 process(CLK, RST)is
 begin
   if (rst = '1') then
-    A_reg_value <= (others => '0');
-  elsif (rising_edge(CLK)) then
+    A_reg_value <= (others => '0'); -- if reset Areg = 0
+  elsif (rising_edge(CLK)) then --if reset 0 input enabled, update Areg
     if (AI = '1') then
       A_reg_value <= A_inout_bus;
     end if;
   end if;
+  A_value <= A_reg_value;
 end process;
 
 process (AO) is
