@@ -7,7 +7,7 @@ use ieee.NUMERIC_STD.all;
 entity INSTRUCTION_REGISTER is
   Port( IR_in : in STD_LOGIC_VECTOR(7 downto 0);
         IR_out : out STD_LOGIC_VECTOR(7 downto 0);
-        CLK : in STD_LOGIC);
+        CLK : in STD_LOGIC;
        --Control Signals
         II : in STD_LOGIC);     
 end INSTRUCTION_REGISTER;
