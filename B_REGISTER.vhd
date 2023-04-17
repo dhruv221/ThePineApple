@@ -9,13 +9,14 @@ entity B_REGISTER is
            BO : in STD_LOGIC;
            --end of control signals
            B_inout_bus : inout STD_LOGIC_VECTOR (7 downto 0);
+           B_value : out std_logic_vector (7 downto 0);
            CLK: in STD_LOGIC;
            RST : in STD_LOGIC);
 end B_REGISTER;
 
 
 architecture Behavioral of B_REGISTER is
-signal B_reg_value: std_logic_vector(7 downto 0);
+signal B_reg_value: std_logic_vector(7 downto 0):= (others => '0');
 begin
 
 process(CLK, RST)is
@@ -27,6 +28,7 @@ begin
       B_reg_value <= B_inout_bus;
     end if;
   end if;
+  B_value <= B_reg_value;
 end process;
 
 process (BO) is
