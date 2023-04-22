@@ -5,13 +5,14 @@ use IEEE.STD_LOGIC_1164.ALL;
 --use UNISIM.VComponents.all;
 
 entity A_REGISTER is
-    Port ( AI : in STD_LOGIC;
-           AO : in STD_LOGIC;
-           --end of control signals
-           A_inout_bus : inout STD_LOGIC_VECTOR (7 downto 0);
-           A_value : out std_logic_vector (7 downto 0);
-           CLK: in STD_LOGIC;
-           RST : in STD_LOGIC);
+    Port (--inouts
+          A_inout_bus : inout STD_LOGIC_VECTOR (7 downto 0);
+          A_value : out std_logic_vector (7 downto 0);
+          --control signals
+          AI : in STD_LOGIC;
+          AO : in STD_LOGIC;
+          CLK: in STD_LOGIC;
+          RST : in STD_LOGIC);
 end A_REGISTER;
 
 
