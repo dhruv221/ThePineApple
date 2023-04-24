@@ -23,14 +23,23 @@ signal RAM_data : RAM_arry := (
 begin
 process(CLK)
 begin
-  --code here
+    
+  if (RI = '1') then
+      RAM_data(to_integer(unsigned(RAM_addres))) <= RAM_in_bus;
+  end if;
+      
 end process;
   
 process(RO)
 begin
-  --code here
+    
+if (RO = '1') then
+    RAM_out_bus <= RAM_data(to_integer(unsigned(RAM_addres)));
+else
+    RAM_out_bus <= (others => 'Z');
+end if;
+    
 end process;
-
 
 
 end Behavioral;
