@@ -5,7 +5,7 @@ use ieee.NUMERIC_STD.all;
 
 entity RAM is
     port(--inouts
-         RAM_addrs : in std_logic_vector(4 downto 0);
+         RAM_addrs : in std_logic_vector(15 downto 0);
          RAM_in_bus : in std_logic_vector(7 downto 0);
          RAM_out_bus : out std_logic_vector(7 downto 0);
          --control signals
@@ -15,7 +15,7 @@ entity RAM is
 end entity;
   
 architecture Behavioral of RAM  is
-type RAM_array is array (0 to 31) of std_logic_vector(7 downto 0);
+type RAM_array is array (0 to 65535) of std_logic_vector(7 downto 0);
 signal RAM_data : RAM_array;
 
 begin
@@ -37,7 +37,7 @@ begin
 if (RO = '1') then
     RAM_out_bus <= RAM_data(to_integer(unsigned(RAM_addrs)));
 else
-    RAM_out_bus <= (others => 'Z');
+     RAM_out_bus <= (others => 'Z');
 end if;
     
 end process;
