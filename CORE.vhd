@@ -3,20 +3,19 @@ use IEEE.STD_LOGIC_1164.ALL;
 
 
 entity CORE is
-    Port ( DATA_BUS : inout STD_LOGIC_VECTOR (7 downto 0);
-    RST : in std_logic;
-    CLK : in std_logic);
+    Port (RST : in std_logic;
+          CLK : in std_logic;
+          --AI, AO, BI, BO, SorD, ALUO, FI, II, SCR, HL, CE, CI, CO, MI, RI, RO, OI : IN std_logic;
+          DATA_BUS : inout STD_LOGIC_VECTOR (7 downto 0);
+          leds : inout std_logic_vector(7 downto 0));
     
 end CORE;
 
 
 
 
-
-
-
-
 architecture Behavioral of CORE is
+--signal DATA_BUS :  STD_LOGIC_VECTOR (7 downto 0);
 -- A register
 component A_REGISTER is
     Port ( AI : in STD_LOGIC;
@@ -80,10 +79,11 @@ end component;
 -- PROGRAM counter 
 component PROGRAM_COUNTER is
     port(--inouts
-         PC_inout_bus : inout std_logic_vector(7 downto 0);
+         PC_in_bus : in std_logic_vector(7 downto 0);
+         PC_out_bus : out std_logic_vector(7 downto 0);
          carryout : out std_logic;
          --control signals
-         C_INC : in std_logic;
+         CE : in std_logic;
          CI : in std_logic;
          CO : in std_logic;
          CLK : in std_logic;
@@ -99,16 +99,58 @@ component MEMADDR_REGISTER is
           CLK : in std_logic);
 end component;
 
+component RAM is
+    port (--inouts 
+          RAM_addrs : in std_logic_vector(15 downto 0);
+          RAM_in_bus : in std_logic_vector(7 downto 0);
+          RAM_out_bus : out std_logic_vector(7 downto 0);
+          --control signals 
+          RI : in std_logic;
+          RO : in std_logic;
+          CLK : in std_logic);
+end component;
+
+component OUTPUT_REGISTER is
+    port (--inouts
+          OUTREG_in : in std_logic_vector(7 downto 0);
+          OUTREG_out : out std_logic_vector(7 downto 0);
+          --control signals
+          OI : in std_logic;
+          CLK : in std_logic);
+end component;
+
+component pcmar_logic is
+    port(--inouts
+         HL : in std_logic;
+         coh : out std_logic;
+         col : out std_logic;
+         cih : out std_logic;
+         cil : out std_logic;
+         mil : out std_logic;
+         mih : out std_logic;
+         -- control signals 
+         CI : in std_logic;
+         CO : in std_logic;
+         MI : in std_logic);
+end component;
+
+component CONTROL_UNIT is
+    port(ADDRESS : in std_logic_vector(14 downto 0);
+         CONTROL : out std_logic_vector(17 downto 0));
+end component;
 
 
-
-signal AI, AO, BI, BO, SorD, ALUO, FI, II, SCR, HorL, CE, CI, CO : std_logic;
-signal CIL, CIH, COL, COH : std_logic;
+signal AI, AO, BI, BO, SorD, ALUO, FI, II, SCR, HorL, CE, CI, CO, MI, RI, RO, OI, HL, HLT : std_logic;
+signal CIL, CIH, COL, COH, MIL, MIH : std_logic;
 signal N, C, Z : std_logic;
-signal A, B, INSTRUCTION : std_logic_vector(7 downto 0);
+signal RAM_addrs : std_logic_vector(15 downto 0);
+signal A, B, INSTRUCTION, OUTPUT_VALUE : std_logic_vector(7 downto 0);
 signal FLAGS : std_logic_vector(2 downto 0);
 signal STEP_COUNT : std_logic_vector(3 downto 0);
 signal PC_carry : std_logic;
+--signal OUTREG : std_logic_vector(7 downto 0);
+
+
 begin
 A_REG: A_REGISTER port map (A_inout_bus => DATA_BUS, 
                             CLK => CLK,
@@ -151,19 +193,77 @@ STEP : STEP_COUNTER port map (step_count => STEP_COUNT,
                               SCR => SCR,
                               CLK => CLK);
 
-PCL : PROGRAM_COUNTER port map (PC_inout_bus => DATA_BUS,
+PCL : PROGRAM_COUNTER port map (PC_in_bus => DATA_BUS,
+                                PC_out_bus => DATA_BUS,
                                 carryout => PC_carry,
-                                C_INC => CE,
+                                CE => CE,
                                 CI => CIL,
                                 CO => COL,
                                 CLK => CLK,
                                 RST => RST);
                                 
-PCH : PROGRAM_COUNTER port map (PC_inout_bus => DATA_BUS,
-                                C_INC => PC_carry,
+PCH : PROGRAM_COUNTER port map (PC_in_bus => DATA_BUS,
+                                PC_out_bus => DATA_BUS,
+                                CE => PC_carry,
                                 CI => CIH,
                                 CO => COH,
                                 CLK => CLK,
                                 RST => RST);
+                                
+MARL : MEMADDR_REGISTER port map (MAR_in_bus => DATA_BUS,
+                                  MAR_out => RAM_addrs(7 downto 0),
+                                  MARI => MIL,
+                                  CLK => CLK);
+
+MARH : MEMADDR_REGISTER port map (MAR_in_bus => DATA_BUS,
+                                  MAR_out => RAM_addrs(15 downto 8),
+                                  MARI => MIH,
+                                  CLK => CLK);
+                                  
+RAM_M : RAM port map (RAM_addrs => RAM_addrs,
+                      RAM_in_bus => DATA_BUS,
+                      RAM_out_bus => DATA_BUS,
+                      RI => RI,
+                      RO => RO,
+                      CLK => CLK);
+                      
+OUTREG_M : OUTPUT_REGISTER port map (OUTREG_in => DATA_BUS,
+                                     OUTREG_out => leds,
+                                     OI => OI,
+                                     CLK => CLK);
+
+pcmar_logic_m : pcmar_logic port map (HL => HL,
+                                      CO => CO,
+                                      CI => CI,
+                                      MI => MI,
+                                      coh => COH,
+                                      col => COL,
+                                      cih => CIH,
+                                      cil => CIL,
+                                      mil => MIL,
+                                      mih => MIH);
+                                      
+CONTROL_UNIT_M : CONTROL_UNIT port map(ADDRESS(3 downto 0) => STEP_COUNT,
+                                       ADDRESS(11 downto 4) => INSTRUCTION,
+                                       ADDRESS(14 downto 12) => FLAGS,
+                                       CONTROL(0) => SorD,
+                                       CONTROL(1) => ALUO,
+                                       CONTROL(2) => AI,
+                                       CONTROL(3) => AO,
+                                       CONTROL(4) => BI,
+                                       CONTROL(5) => BO,
+                                       CONTROL(6) => HL,
+                                       CONTROL(7) => CE,
+                                       CONTROL(8) => CI,
+                                       CONTROL(9) => CO,
+                                       CONTROL(10) => MI,
+                                       CONTROL(11) => FI,
+                                       CONTROL(12) => II,
+                                       CONTROL(13) => RI,
+                                       CONTROL(14) => RO,
+                                       CONTROL(15) => OI,
+                                       CONTROL(16) => SCR,
+                                       CONTROL(17) => HLT);
+                                       
 
 end Behavioral;
