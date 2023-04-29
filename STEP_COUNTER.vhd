@@ -19,7 +19,7 @@ begin
 
 process(CLK, SCR) is
 begin
-    if(rising_edge(CLK)) then
+    if(falling_edge(CLK)) then
         step_counter_value <= step_counter_value + "0001";
     else
         step_counter_value <= step_counter_value;
