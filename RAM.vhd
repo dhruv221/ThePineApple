@@ -16,7 +16,13 @@ end entity;
   
 architecture Behavioral of RAM  is
 type RAM_array is array (0 to 65535) of std_logic_vector(7 downto 0);
-signal RAM_data : RAM_array;
+signal RAM_data : RAM_array := (b"00000001",
+                                b"00000011",
+                                b"00000010",
+                                b"00000011",
+                                b"00000011",
+                                b"00000100",
+                                others => b"00000000");
 
 begin
 process(CLK)
